@@ -1,0 +1,210 @@
+@charset "UTF-8";
+
+/* layout */
+#wrapper {
+  background-color: azure;
+  height: 100%;
+}
+.ly_wrap {
+  height: 100%;
+  overflow-x: hidden;
+}
+.ly_subContainer {
+  padding-bottom: 120px;
+}
+.ly_subConents {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-top: 60px;
+}
+
+.box {
+  border: 1px solid red;
+  height: 500px;
+}
+
+/* has 사용 */
+/* header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  transition: all 0.2s;
+}
+header:has(.navi > li > a:hover) {
+  background-color: #fff;
+}
+.gnbBg {
+  background-color: #fff;
+  border-top: 1px solid lightgray;
+  height: 100px;
+  opacity: 0;
+  position: absolute;
+  transition: all 0.2s;
+  top: 100%;
+  visibility: hidden;
+  width: 100%;
+}
+.gnbBg:has( ~ .gnbWrap .navi > li > a:hover) {
+  opacity: 1;
+  visibility: visible;
+}
+.gnbWrap {
+  align-items: center;
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+.logo {
+  font-size: 30px;
+}
+.navi {
+  display: flex;
+  flex: 0 1 800px;
+  justify-content: space-between;
+  position: relative;
+}
+
+.navi > li > a {
+  display: block;
+  padding: 30px 0;
+  position: relative;
+}
+.navi > li > a:after {
+  background-color:cadetblue;
+  bottom: 0;
+  content: "";
+  height: 2px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+}
+.navi > li > a:hover:after {
+  opacity: 1;
+  visibility: visible;
+}
+.navi > li ul {
+  position: absolute;
+  display: flex;
+  opacity: 0;
+  top: 100%;
+  transition: all 0.2s;
+  visibility: hidden;
+  width: 100%;
+}
+.navi > li:has( > a:hover) ul {
+  opacity: 1;
+  visibility: visible;
+}
+.navi > li.depth1-1 ul {
+  left: 0;
+}
+.navi > li.depth1-2 ul {
+  left: 190px;
+}
+.navi > li.depth1-3 ul {
+  left: 375px;
+}
+.navi > li.depth1-4 ul {
+  left: 568px;
+}
+.navi > li.depth1-5 ul {
+  left: 760px;
+}
+.navi > li ul:hover {
+  opacity: 1;
+  visibility: visible;
+}
+.navi > li ul li + li {
+ margin-left: 50px;
+} */
+
+header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+.gnbBg {
+  background-color: #fff;
+  border-top: 1px solid lightgray;
+  height: 100px;
+  display: none;
+  position: absolute;
+  transition: all 0.2s;
+  top: 100%;
+  width: 100%;
+}
+.gnbWrap {
+  align-items: center;
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+.logo {
+  font-size: 30px;
+}
+.navi {
+  display: flex;
+  flex: 0 1 800px;
+  justify-content: space-between;
+  position: relative;
+}
+
+.navi > li > a {
+  display: block;
+  padding: 30px 0;
+  position: relative;
+}
+.navi > li > a:after {
+  background-color: cadetblue;
+  bottom: 0;
+  content: "";
+  height: 2px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+}
+.navi > li > a:hover:after {
+  opacity: 1;
+  visibility: visible;
+}
+.navi > li ul {
+  position: absolute;
+  display: flex;
+  top: 100%;
+  transition: all 0.2s 0.2s;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+}
+.navi > li.active ul {
+  opacity: 1;
+  visibility: visible;
+}
+.navi > li.depth1-1 ul {
+  left: 0;
+}
+.navi > li.depth1-2 ul {
+  left: 190px;
+}
+.navi > li.depth1-3 ul {
+  left: 375px;
+}
+.navi > li.depth1-4 ul {
+  left: 568px;
+}
+.navi > li.depth1-5 ul {
+  left: 760px;
+}
+.navi > li ul li + li {
+ margin-left: 50px;
+}
+
+header.active {
+  background-color: #fff;
+}

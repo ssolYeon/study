@@ -1,0 +1,71 @@
+@charset "UTF-8";
+
+/* layout */
+.ly_wrap {
+  height: 100%;
+  overflow-x: hidden;
+}
+.ly_subContainer {
+  padding-bottom: 120px;
+}
+.ly_subConents {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-top: 60px;
+}
+
+h1 {
+  font-size: 40px;
+  margin-bottom: 30px;
+}
+
+/* input:out-of-range, :in-range */
+.ly_subConents-1 li {
+  list-style: none;
+  margin-bottom: 1em;
+}
+.ly_subConents-1 input {
+  border: 1px solid black;
+}
+.ly_subConents-1 input:in-range {
+  background-color: rgba(0, 255, 0, 0.25);
+}
+.ly_subConents-1 input:out-of-range {
+  background-color: rgba(255, 0, 0, 0.25);
+  border: 2px solid red;
+}
+.ly_subConents-1 input:in-range + label::after {
+  content: "okay.";
+}
+.ly_subConents-1 input:out-of-range + label::after {
+  content: "out of range!";
+}
+
+/* input:default */
+.ly_subConents-2 input:default {
+  box-shadow: 0 0 2px 1px coral;
+}
+.ly_subConents-2 input:default + label {
+  color: coral;
+}
+
+/* :ampty */
+.ly_subConents-3 .box {
+  background: pink;
+  height: 80px;
+  width: 80px;
+}
+.ly_subConents-3 .box:empty {
+  background: lime;
+}
+.ly_subConents-3 .inner-p {
+  height: 30px;
+  width: 30px;
+}
+.ly_subConents-3 .box p:empty {
+  background: blue;
+}
+
+.ly_subConents-3 .box_wrap {
+  display: flex;
+}
