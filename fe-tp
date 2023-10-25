@@ -1,0 +1,550 @@
+[prettier 자동 줄바꿈 해지]
+prettier 자동 줄바꿈 방지는 아래 코드로
+주석표기 법으로 제어
+// prettier-ignore
+
+예)
+// prettier-ignore
+return src("_dev/gate/gt_asset/scss/*.scss")
+.pipe(sass().on("error", sass.logError))
+.pipe(dest("_dev/gate/gt_asset/css"))
+.pipe(browserSync.stream());
+
+---------------------------------------------------------------------------------------------------------
+
+[css clamp()]
+박스크기나 폰트사이즈등을 최소, 최대값 범위안에서 조절이 가능합니다.
+
+clamp(최소, 기준값, 최대)의 문법으로 작성하고 max(최소, min(기준값, 최대)) 와 동일하게 사용도 가능합니다.
+
+예) font-size: clamp(20px, 2.5vw, 40px) 라면
+
+20px ~ 40px 범위내에서 2.5vw 단위로 조절된다는 의미, 20px 이하로 줄지않고, 40px이상으로 커지지도 않습니다.
+이걸 잘 이용하면 가변으로 폰트가 바뀌여야하는 환경에서 미디어쿼리를 좀 줄이거나 안써도 되겠죠.
+
+css variable을 활용하면 더 강력해집니다.
+
+:root{
+--minSize : 20px;
+--maxSize : 40px;
+}
+
+font-size: clamp(var(--minSize), 2.5vw, var(--maxSize) );
+
+@media all and (max-width: 768px) {
+--minSize : 10px;
+--maxSize : 30px;
+}
+
+768px 이하화면에서는 font-size: clamp( 10px, 2.5vw, 30px ); 로 나오게 됨.
+
+https://developer.mozilla.org/en-US/docs/Web/CSS/clamp
+
+---------------------------------------------------------------------------------------------------------
+
+[유용한 vscode 확장 (peacock, Rainglow)]
+이름: Peacock
+ID: johnpapa.vscode-peacock
+창의 색상을 커스텀 할 수 있습니다. 프로젝트는 여러개인데 색은 같으면 구분이 어렵겠죠. 그럴때 사용하세요
+
+이름: Rainglow
+ID: daylerees.rainglow
+글자색상 설정 테마입니다 하단 작업표시줄도 영향을 받습니다만 적용순서에따라 Peacock가 우선이 되기도합니다. 가독성 좋은걸로 색상골라서 써보세요
+
+---------------------------------------------------------------------------------------------------------
+
+[resize observer]
+https://web.dev/i18n/ko/resize-observer/
+
+window.resize 이벤트를 사용하는것 보다는 성능상 이점이 더 크다고 합니다. (Reflow 방지)
+
+intersection observer처럼 특정 요소만 감시할 수 있기때문에 (제일 큰 장점이라고 생각)
+경우에 따라서는 컨테이너쿼리를 대체하는기능도 가지고 있는것 같다고 생각이 드네요.
+
+이 기술의 또다른장점은 리사이즈가 일어나지 않아도 감시가 시작되는순간 이벤트가 일어난다는것에 있습니다. 기존 방식은 resize, load일때도 되어야하는경우가 있을때는 두 이벤트를 같이써야했었죠,
+
+일일보고 페이지에서 시범적으로 사용해봤어요.
+
+    // 특정 엘리먼트의 리사이즈 event를 받기위해 ResizeObserver를 사용.
+    const ro = new ResizeObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        // 헤더가 위로 올라가는 시점. @container ly_wrap (max-width: 968px) 기준을 따름
+        const isMobile = entry.contentBoxSize[0].inlineSize <= 968;
+        if (!isMobile) {
+          document.querySelector('.bl_gnb').classList.remove('gnbShow');
+        }
+      });
+    });
+
+    ro.observe(document.querySelector('.ly_wrap'));
+그외 스크롤 이벤트 없이도 요소가 뷰 안에 들어와 있는지 감지하는 intersection observer
+요소의 변화를 감지하는 mutation observer도 많이 사용되고 있습니다
+
+---------------------------------------------------------------------------------------------------------
+
+[JS에서 CSS사용 방법]
+기존에 이렇게 사용했다면
+
+this.gnbBar.style.transform = `translateX(${posx}px)`;
+this.gnbBar.style.width = `${wd}px`;
+this.gnbBar.style.opacity = 1;
+this.gnbBar.style.transition = "all 0.3s ease-in-out 0s";
+이렇게 변경해서 CSS에서 쓰던 방식 그대로 사용가능
+속성은 cssText이용해서 JS백틱으로(``) 사용
+
+this.gnbBar.style.cssText = `
+  transform: translateX(${posx}px);
+  width: ${wd}px;
+  opacity: 1;
+  transition: all 0.3s ease-inout 0s;
+`;
+
+this.gnbBar.style.marginBottom = `${wd}px`;
+
+this.gnbBar.style.cssText = `
+  margin-bottom: ${wd}px;
+`;
+cssText에서는 카멜케이스로 하지않고 일반문법으로 하면 됩니다
+
+---------------------------------------------------------------------------------------------------------
+
+[intersection observer를 활용한 aos 플러그인 v1.0]
+
+https://codepen.io/vanadis0929/pen/XWyYQLX
+
+심심할때 테스트 해보시고 혹시 에러가 있다면 제보부탁드립니다... 문의도 환영합니다
+
+aos.js의 주요기능을 intersection observer를 사용하여 구현해보았습니다. 간단하게나마는 실전에서도 사용할 수 있을 것 같아요. 왜그런지는 모르겠지만 codepen에서는 동작이 잘 안되어서 요청주시면 http://192.168.0.58:5501/aos.html url로 보실 수도 있습니다.
+
+주요기능 및 특징?#
+- rootmarginBottom영역을 박스가 벗어나면 aos가 활성됩니다, threshold 범위를 시각화해서 실제로 어떻게 동작하는지 파악할 수 있게 작업, 반대로 rootmarginTop 영역으로 박스가겹쳐지면 aos가 비활성화됩니다.
+css는 aos.js에서 사용하는 css파일을 그대로 사용.
+- 제이쿼리 사용하지 않음.
+- easing, duration, delay 기본값, 개별 요소마다 설정 가능
+- 현재요소외에 앞의것들도 자동 active되게(reversible), 역재생(once), 범위(threshold) 커스텀 가능
+
+---------------------------------------------------------------------------------------------------------
+
+[SVG 관련]
+https://velog.io/@ggong/SVG-%EC%95%8C%EA%B3%A0-%EC%93%B0%EA%B8%B0-%EC%B5%9C%EC%A0%81%ED%99%94
+
+성능이나 최적화 관련 글이 있어 퍼와봤습니다,
+
+---------------------------------------------------------------------------------------------------------
+
+[git 사용 시 Deletion of directory failed 관련 에러 해결법]
+깃은 브랜치를 전환하거나 머지, 리베이스등을 할 때 디렉토리를 지우기도 추가하기도 하는데
+
+Deletion of directory '폴더명' failed. Should I try again? (y/n) 이라는 메시지가 뜰 때 해당 폴더에서 사용하는 파일이나 경로가 다른 프로그램에서 사용상태를 체크해보세요.
+
+해당 폴더가 미디어 파일이라면 해당 미디어파일이 재생중인지 체크 필요.
+
+출처 https://stackoverflow.com/questions/11923635/git-tries-to-delete-a-directory-on-checkout
+
+---------------------------------------------------------------------------------------------------------
+
+[css grid 레이아웃에 애니메이션 넣기]
+grid-template-rows, grid-template-columns 값을 조절하여 레이아웃의 크기 변화를 조절해준 후 transition을 이용해 애니메이션을 넣어줍니다.
+메뉴의 크기를 조절할 수 있고 숨길 수도 있습니다.
+참고 url에 있는 예제를 보시고 적용 방법을 확인해보세요.
+
+참고 url : https://css-tricks.com/animating-css-grid-how-to-examples/
+
+http://mong.gnflex.co.kr/html/cu/CU040100.html
+여기 아코디언이 grid-template-rows 제어로 만든 페이지에요
+
+bl_accordion에 bl_accordion--animation 클래스 붙이면 적용됨
+(http://mong.gnflex.co.kr/html/ui_common/accordion.html)
+
+---------------------------------------------------------------------------------------------------------
+
+[몽고에서 사용한 css 기술 (css variable, clamp)]
+https://codepen.io/vanadis0929/pen/wvQRmRO
+
+대표적으로 사용했던 css 관련 기술들입니다. 개발자 도구를 열어서 어떻게 동작하는지 확인해보세요. 궁금한부분은 언제든 질문!
+
+css 변수 사용
+
+기존 sass변수로 사용하던 폰트 타입별 수치를 variable로 변환, 초기선언만 해두고 각각케이스 마다 variable만 바꿔서 사용
+예제에는 :root 에 만들어서 어디든 접근 가능하지만 각각 클래스에 선언하면 지역적으로 관리할 수 있음.
+clamp 사용
+
+미디어쿼리 없이 최소, 최대값을 활용하여 폰트사이즈, 간격등을 유동적으로 조정
+
+---------------------------------------------------------------------------------------------------------
+
+[css @property]
+css variable을 좀 더 깊이 쓸 수 있는 기능이에요. https://developer.mozilla.org/en-US/docs/Web/CSS/@property
+
+단순 변수가아닌 css 커스텀 속성을 만드는 기능입니다.
+
+예) 각도를 제어하는 임의의 속성 degree
+
+@property --degree {
+  syntax: "<angle>"; 
+  inherits: false;
+  initial-value: 0deg;
+}
+syntax: 이 속성에서 사용할 값의 문법형태 정의, css 속성의 값처럼 실제 인식할 값의 형식을 정의하는것입니다 (https://developer.mozilla.org/en-US/docs/Web/CSS/@property/syntax)
+inherits: 상속여부 정의
+initial-value: 초기값 생성
+
+https://codepen.io/vanadis0929/pen/wvQRmRO 아래 부분에 이것을 활용한 그라데이션 애니메이션을 만들어봤어요 단순 변수로만해서는 애니메이션이 진행되지 않습니다. animatable하게 바꿔야하기 때문.
+(참고 예제 : https://dev.to/afif/we-can-finally-animate-css-gradient-kdk)
+
+---------------------------------------------------------------------------------------------------------
+
+[SVG이미지 Filter로 변경하기(Hex Color To CSS Filter Converter)]
+Hex Color To CSS Filter Converter
+
+코드 적용 방법#
+ &::before {
+   background: url(path.$COMMON_BG_URL + "icon_controll_sr2.svg") no-repeat center center;
+   filter: invert(48%) sepia(11%) saturate(2617%) hue-rotate(184deg) brightness(99%) contrast(89%);
+  }
+
+---------------------------------------------------------------------------------------------------------
+
+[CSS Logical Properties]
+박스를 중앙정렬할때 습관적으로 margin: 0 auto; 를 사용하게 되는데
+
+반응형등에서 pc에서 margin-top이 적용된 경우에 이하 구간에서 margin: 0 auto; 를 습관적으로 쓰게되면 의도치않게 pc의 값을 덮어써버리는 경우가 발생함.
+
+margin-left: auto;
+margin-right: auto; 로 사용할 수도 있지만
+
+margin-inline: auto; 로 좌우를 지칭해서 적는것이 구분도 쉽고 상위에서 상속받은 값을 유지해야하는경우에 용이할 수 있음.
+
+width: 100%;
+max-width: 1024px;
+margin: 0 auto; 
+
+를
+
+
+width: min(100%, 1024px);
+margin-inline: auto; 
+
+로 간결하게 작성이 가능.
+*-inline: leftValue rightValue
+    *-inline-start: leftValue
+    *-inline-end: rightValue 
+
+*-block: topValue bottomValue
+    *-block-start: topValue
+    *-block-end: bottomValue
+결정적으로 이 속성을 사용하는 제일 큰 이유는 글자의 방향에 따른 인식의 차이를 잡아주는것에 있음. 굳이 사용하지 않아도 되지만, 다국어 페이지를 할때는 반드시 알아야하는 개념.
+https://caniuse.com/css-logical-props
+https://wit.nts-corp.com/2019/08/05/5621
+
+inset
+
+position에서 사용 할 수 있는 단축 속성.
+
+top:0; right: 0; bottom: 0; left: 0; 은 inset: 0 과 동일.
+
+위와 마찬가지로 
+inset-block / inset-block-start / inset-block-end 
+inset-inline / inset-inline-start / inset-inline-end 로 도 사용가능
+이 외에도 float, border, text-align 등 left/right/top/bottom 을 지정하는 css에는 Logical Properties 개념을 정의 할 수 있음
+
+ex:
+
+float: left -> float: inline-start; (현 시점에서는 사파리, 파이어폭스만 지원)
+border-top: 1px solid #000; border-block-start: 1px solid #000;
+
+---------------------------------------------------------------------------------------------------------
+
+[유용한 툴팁 플러그인 Tippy]
+https://atomiks.github.io/tippyjs/
+
+다운로드는 https://github.com/atomiks/tippyjs/releases/tag/v6.3.7
+
+기능이 많고 다양한 확장을 제공합니다
+
+---------------------------------------------------------------------------------------------------------
+
+[꼭!! 알아야 할 프로젝트 관련 용어 정리]
+UX (User Experience)
+사용자가 서비스나 제품 등을 직,간접적으로 얻게 되는 사용자 경험.
+
+UI (User Interface)
+어떠한 기능을 사용하기 위한 시나리오 (사용방법).
+
+GUI (Graphic User Interface)
+어떠한 기능을 사용하기 위해서 UI를 그래픽적으로 화면에 표시하는 Look&Feel.
+
+IA (Information Architecture)
+정보구조도 (메뉴구조).
+
+GNB (Global Navigation Bar)
+페이지 전체에서 고정된 위치에서 각 페이지로의 이동기능 제공.
+
+LNB (Local Navigation Bar)
+각 서브페이지의 성격에 따라 독립적인 형태로 존재.
+
+Layout
+화면구성과 전반적인 배열을 의미.
+
+딤드(Dimmed)
+레이어 팝업 등을 띄울때 배경을 어둡게(반투명)으로 처리하는 것
+
+더미
+원래는 의복의 디자인·제작·진열 등에 쓰이는 인체의 모형을 [ 人體模型 , dummy ]말하는 용어이나..
+프로젝트상에서는 기획이나 디자인파트에서 완성된 결과물을 만들어내기 전... 내부 TF 또는 담당자가 미리 결과물을 가늠할수 있도록 제작하는 행위.
+
+와이어프레임
+흔히 기획파트에서 스토리보드 작성 전에 기획자의 의도(화면 전환 및 전반적인 레이아웃, 컨텐츠 그룹핑 등)를 인지할수있도록 하는 일종의 스케치
+
+util
+GNB 상단에 위치한 로그인, 회원가입, 즐겨찾기 등의 작은 최상단 메뉴.
+
+웹 접근성
+“장애에 구애 없이 모든 사람들이 손쉽게 정보를 공유할 수 있는 공간”
+장애인 차별 금지법에서 생겨났으며 그 어떠한 사이트로 하여금 장애인과 일반인이 차별되지 않도록 한 사이트를 모든 사람들이 사용할 수 있도록 만드는 것.
+
+웹 표준
+국제웹표준화기구(W3C)에서 지정하였으며, 세계 각국의 다양한 기존의 html 문서방식을 표준화하여 어떤 브라우저에서도 모두 동일한 사이트를 볼 수 있도록 만드는 것.
+장애를 가진 사람, 또는 고령자 등 누구나 쉽게 웹문서를 공유하고자함.
+
+타이포그래피 (Typography)
+활자 서체를 중심으로한 2차원적 그래픽 디자인 표현 방법.
+
+캘리그래피 (Calligraphy)
+손으로 그린 그림문자라는 뜻으로 핸드레터링 기술을 뜻함.
+
+CSS (CasCading Style Sheets) /스타일시트
+웹 문서의 전반적인 스타일을 미리 저장해둔 스타일시트. 웹사이트 전체의 일관성을 유지 할 수 있고 세세한 스타일 지정의 필요를 줄어들게 함.
+
+반응형웹 (Responsive Web)
+디바이스의 사이즈에 따라 자동적으로 레이아웃의 재배치 또는 크기가 변하여 최적화된 화면을 제공하는 웹사이트로 타블렛, 모바일 각각의 웹사이트의 별도 제작이 필요하지 않아 비용을 절감할 수 있음. ie의 경우 낮은 버전에서는 미디어쿼리를 지원하지 않아 불가능함.
+
+톤앤매너 (Tone and Manner)
+색조를 의미하는 영단어 Tone과 방법, 방식 등을 뜻하는 영단어 Manner를 합쳐 만든 용어로 전체적인 색감이나 표현 기법.
+
+바레이션 (Variation)
+기존에 제작되어진 결과물을 수정 및 변경하는 작업 뜻함.
+
+업무스콥 (Scope)
+기획파트에서 많이 사용되는 용어로 업무 범위와 영역을 뜻함
+
+프로토타입 (prototype)
+원형, 제작물의 기본형. 실제 디자인 작업에 들어가기에 앞서 시험용 또는 견본으로 작업하는 가안.
+
+제안시안 (proposal)
+고객사에게 선택 받기 위해 또는 시각적으로 보여주기 위해 만드는 시안으로 완성된 디자인이 아닌 계획된 암시적 시안.
+
+제안용 시안
+처음부터 완벽을 가해 시안을 잡기보다 클라이언트의 선택의 폭을 넓일 수 있도록 유형별 시안을 잡아서 제시.
+이해를 돕기 위해 실제 설치될 디바이스에 얹어서 보여주는 것도 효과적.
+실제 제작에 용이하도록 눈에 보이지 않는 부분들과 연결 방법까지 상세하게 풀어주고 설명해주는 실제 시안.
+목업 (mock-up) 실물 크기의 모형으로 평면적인 시안이 아닌 입체적인 시안
+
+경쟁용PT 시안
+경쟁용 PT 시안에서는 상세하고 세부적인 정보를 보여주기 보다는 전체적인 컨셉과 방향성, 회사 또는 디자이너의 역량과
+재량을 충분히 알릴 수 있도록 전략적이고 기획력있게 보여주는 것이 요구됨.
+
+컨셉 (concept)
+브랜드 아이덴티티의 핵심적인 요약본.
+본질적인 내용과 차별점으로 전달하고자 하는 메시지를 커뮤니케이션 할 수 있도록 개념화 한 것. (디자인의 방향성)
+
+벤치마킹 (benchmarking)
+어떤 특정 분야에서 우수한 상대를 표적으로 삼아 성과 차이를 비교하며 분석하는 것.
+스타일 가이드 / 디자인 가이드 / 웹스타일 가이드 (Style Guide / WSG)
+메인과 서브페이지에 사용되는 모든 디자인 요소(컬러, 버튼, 게시판, 테이블, 간격, 폰트 등)를 정하는 문서나 그림 파일.
+
+다이어그램 (diagram)
+정보를 시각화하는 기술. 상호관계나 과정, 구조 등을 이해시키는 설명적인 그림.
+
+디벨롭 (develop)
+문제점을 보안하여 디자인의 완성도를 높여가는 과정.
+
+스큐어모피즘 (skeuomorphism)
+실제 존재하는 물체를 본따 디자인한 것.
+
+리사이징 (resizing)
+기본에 디자인 된 그래픽 파일을 주어진 사이즈에 맞추어 재디자인 하는 것.
+
+코치마크 (coach marks)
+어플리케이션이나 웹을 사용 시 처음 실행시켰을 때 아이콘에 대한 도움말이 적힌 화면이나 터치방향을 알려주는 화면.
+
+토글버튼 (toggle button) / 토글스위치 (toggle swtich)
+하나의 설정 값으로부터 다른 값으로 전화해주는 것으로 on/off를 설정할 때 사용하는 버튼을 칭함.키보드의 caps lock 도 토글형태의 버튼.
+
+Splash screen
+브라우저, 어플리케이션 등을 실행시키면 잠시동안 로고나 간략한 정보글이 뜨는 로딩 페이지.
+
+네이티브 앱
+모바일 기기에 최적화된 언어로 개발된 어플리케이션으로 안드로이드는 SDK를 이용하여 java로 제작되며
+아이폰의 경우 iOS SDK를 이용해 Objective-C언어를 이용하여 제작된다.
+
+모바일웹
+모바일에 최적화된 웹을 뜻하며 모바일 기기에 최적화된 UI와 UX를 염두에 두고 제작한다.
+모바일기기에 사용되는 웹브라우저를 통해 서비스를 제공하는 형태
+
+웹 앱
+모발일웹과 네이티브 앱을 결합한 상태로 모바일웹의 특징을 가지면서 네이티브앱의 장점도 갖는다.
+모바일웹처럼 HTML, CSS, Javascript, JSP, ASP 등 일반적인 웹기술로 개발한다.
+
+하이브리드 앱
+웹 앱의 단점을 보안한 것으로 별도의 하이브리드 앱 프레임워크(폰갭, 앱스프레소 등)를 사용하여 제작한다.
+외부 형태는 네이티브앱이지만 내부는 모바일 웹앱으로 실행된다.
+
+SI업체 (System integration)
+정보 시스템의 개발에 관한 전문적인 프로젝트를 진행하는 업체로써 설계, 개발, 운영 및 유지보수 관리 등
+일체의 업무를 담당하는 정보 통신 기업을 말한다.
+
+SM업체 (System management)
+일반적으로 고객의 정보시스템 기능을 강지 계약하에 지속적으로 관리하고 운영하는 것으로 하드웨어, 소프트웨어, 네트워크, 인프라 등을
+개발 운용 유지보수 하고 이를 향상시키는 업무를 담당하는 기업을 말한다.
+
+Web Agency
+온, 오프라인 기업을 대상으로 인터넷 비즈니스에 대한 솔루션을 제공하는 업무를 담당하며 인터넷 사업 컨설팅, 마케팅, 제작 및 유지보수 등
+웹에 대한 모든 업무를 담당하는 기업을 말한다.
+
+구축
+기존에 존재하지 않던 시스템을 개발해 내는 것
+
+공수산정
+프로젝트에 투입되는 업무범위와 그에 해당하는 투입인력을 비교 분석하는 것
+
+과업지시서
+용역계약서 상의 갑(발주자)가 을에게 요구하는 과업에 대해 정해진 소정의 양식으로 작성한 문서
+
+Renewal (리뉴얼) / 재구축
+기존에 있던 사이트를 새롭게 재구축하는 것.
+
+운영 / 유지보수
+제작 완료된 홈페이지가 정상적으로 운영될 수 잇도록 지속적으로 관리 및 개선.
+
+WBS (Work Breakdown Structure)
+작업 명세 구조도. 프로젝트의 범위, 전체일정, 최종산출물을 세부요소로 분할한 계층적 구조도.
+
+TFT (Task Force Team)
+새로운 일(프로젝트)을 추진할 때 각 부서 및 해당 부서에서 선발된 Task에 관련된 인재들이 임시 팀을 만들어 활동하는 것.
+
+PM (Project Manager)
+프로젝트의 일정 및 최선의 자원, 요구사항에 다른 프로젝트 범위를 관리하며
+최고의 의사결정으로 프로젝트를 성공적으로 이끌어가는 감독 지휘자.
+
+PL (Project Leader)
+프로젝트를 함께하는 구성원에게 비전을 제시하고 관리하며 방향성을 이끌어 주는 팀의 책임자.
+
+PA (Project Assitant)
+프로젝트 실무자.
+
+RFP (Request for proposal)
+업무요구, 기술요구, 운영요구에 해당하는 요구사항을 발주처에서 작성하여 제시하는 제안요청서.
+
+RFI (Request for information)
+RFP에 명시된 주요 요구사항에 대해 제안 참여 업체에서 해당 요구사항별로 질의를 통해 답변 요청하는 문서.
+
+Bidding
+프로젝트를 입찰건에 참여하여 수주를 따기 위한 경쟁을 한다는 의미
+
+SB (Story Board)
+스토리보드 (화면설계서).
+
+Critical
+좋지 않은 이슈나 상황이나 결과물에 영향을 줄 수 있는 좋지 않은 상태를 의미
+
+Front-end
+사용자단 (Front 단이라고도 함).
+
+Back office
+관리자단 (Back 단이라고도 함).
+
+Depth
+메뉴의 단계를 의미하는 용어로, 일반적으로 1Depth, 2Depth와 같은 형식으로 사용되며,단계가 깊어질수록 세부적인 카테고리 의미.
+
+Footer
+페이지 하단에 위치한 공통 노출 요소로써, 보통 회사관련 정보 및 서비스의 정책, 각종 신고정보(사업자 등록번호, 통신판매업 신고).
+
+PG (Payment Gateway)
+이니시스, 다날과 같은 결제 대행업체를 지칭.
+
+CMS (Contents Management System)
+콘텐츠관리시스템.웹사이트를 구성하고 있는 다양한 콘텐츠를 효율적으로 관리할 수 있도록 도와주는 시스템.
+
+BPR (Business peocess reengineering)
+비용, 품질, 서비스, 속도와 같은 핵심적 부분에서 극적인 성과를 이루기 위해 기업 업무 프로세스를 기본적으로 다시 생각하고 근본적으로 재설계하는 것.
+BPR은 모든 부분에 걸쳐 개혁을 하는 것이 아니라 중요한 비즈니스 프로세스들,
+즉 핵심(core) 프로세스를 선택하여 그것들을 중점적으로 개혁해 나가는 것.
+
+R&R (Role and Responsibilities)
+책임감.한 프로젝트에 있어 본인의 위치해서 수행해야할 업무에 관한 책임 관계 정립.
+
+As-is
+현재의 업무 프로세스 및 상황을 뜻함.
+needs 분석 자료를 토대로 as-is와 needs 간의 gap 분석을 통하여 구현하고자 하는 이슈를 도출하는 자료가 됨.
+
+To-be
+앞으로 되었으면 하는 상황이라는 뜻으로 도출하고자 하는 이슈 사항들. 개선 방향, 목표.
+
+CMS(Content Management System)
+웹사이트를 구성하고 있는 다양한 콘텐츠를 효율적으로 관리할 수 있도록 도와주는 시스템
+
+B2B(Business to Business)
+전자상거래의 유형 가운데 하나로, '기업간 거래' 또는 '기업간 전자상거래'라고도 한다
+
+B2C(Business to Custome)
+기업과 소비자 간 전자거래를 의미하며, 일반적으로 인터넷쇼핑몰을 통한 상품의 주문 판매를 뜻한다
+
+MRO
+유지(Maintenance)
+보수(Repair)
+운영(Operation)
+
+QA
+-QA(Quality Assurance)는 품질보증을 뜻합니다. 어떤 실체(품목, Entity)가 품질 요구 사항을 충족하는 것에 대한 적절한 신뢰감을 주기 위하여 품질시스템에서 실시되고 필요에 따라 실증되는 모든 계획적이고 체계적인 활동을 말합니다.
+
+QC
+-QC(Quality Control)는 품질관리를 뜻합니다. 품질관리란 기업 경영상 제일 유리하다고 생각되는 품질을 보장하고 이것을 가장 경제적 제품으로서 생산하는 방법을 말합니다. 또한 품질에 대한 요구 사항을 만족시키기 위해 사용되는 운영상의 기법 및 활동을 말합니다.
+
+CR
+CR(Chang Requst)
+
+FRD
+FRD (Functional Requirements Document)
+
+용어(CSS 클래스명 참고용)
+-stretch header : 좌우 풀 이미지 배경을 뜻함
+-MegaMenu(전체메뉴) 또는 Full DropDownMenu(전체메뉴)
+-CurtainMenu : 커튼형식 메뉴 좌에서우로 또는 우에서 좌로 콘텐츠를 덮는 형식 메뉴
+-Collapsible Sidebar Menu : 좌 또는 우에서 콘텐츠 영역을 밀면서 나오는 메뉴
+-Collapsible SidePanel Menu : 좌 또는 우에서 콘텐츠 영역을 덮으면서 나오는 메뉴
+-Pagination : 게시판 하단 쪽수
+-Notification Buttons : 알림버튼
+-Scroll Back To Top Button : 스크롤 상단으로 이동 버튼
+
+---------------------------------------------------------------------------------------------------------
+
+[반응형 해상도(최소, 최대)이야기]
+기본 사이즈 개념
+
+모바일 가로 기준 360이면 : x 2 = 720, x 3 = 1080, x 4 = 1440, x 5 = 1800, x6 = 2160#
+모바일 가로 기준 320이면 : x 2 = 640, x 3 = 960, x 4= 1280, x 5 = 1600, x6 = 1920#
+320, 360 모바일 사이즈가 표준으로 꼽히는 이유는?
+초기 스마트폰으로 대중화됐기 때문이다.
+2007년 아이폰이 처음 출시됐을 때 해상도는 320픽셀이었다.
+이것은 모바일 장치에 널리 채택된 표준이 되었다.
+마찬가지로 스마트폰 갤럭시 시리즈도 320픽셀의 해상도로 시작했다.
+그러나 새로운 모델이 출시되면서 360 및 375 픽셀과 같은 크기가 보편화되었다.
+오늘날 360픽셀은 종종 모바일 화면의 최소 표준으로 간주된다.
+
+여기서 언급한 문제는 반응형 디자인과 관련이다.
+웹사이트나 애플리케이션을 반응형으로 디자인할 때 레이아웃과 콘텐츠는 모바일과 데스크탑을 포함한 다양한 화면 크기에 맞게 조정된다.
+반응형 디자인에 모바일 가로 기준(예: 360 픽셀)을 적용할 때 문제가 발생한다.
+데스크탑 화면의 최대 해상도가(1920픽셀) 의도하지 않은 방식으로 왜곡되거나(1920픽셀 해상도가 나올 수 없음) 변경될 수 있다.
+이것은 다양한 화면 크기에 대한 디자인의 균형을 유지하고 장치 간에 일관성을 유지하는 데 있어 어려운 점을 강조한다.
+
+반응형 사이트(국내) : http://rwdb.kr/
+
+디자인 그리드 사이트
+https://www.webfx.com/blog/web-design/the-960-grid-system-made-easy/
+https://spoqa.github.io/2012/11/20/about-grid-system.html
+
+그리드 시뮬레이터
+http://gridcalculator.dk/
+
+https://yesviz.com/viewport/ 여기가 좀 참고가 될 것 같습니다 기기별 뷰포트사이즈 실제사이즈 등이 정리되어 있어요
