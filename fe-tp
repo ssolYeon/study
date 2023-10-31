@@ -546,6 +546,7 @@ https://spoqa.github.io/2012/11/20/about-grid-system.html
 
 그리드 시뮬레이터
 http://gridcalculator.dk/
+https://yesviz.com/viewport/ 여기가 좀 참고가 될 것 같습니다 기기별 뷰포트사이즈 실제사이즈 등이 정리되어 있어요
 
 ---------------------------------------------------------------------------------------------------------
 
@@ -575,5 +576,3 @@ $ git fetch --all && git rebase origin/master
 그래프 보고 안 붙어져 있으면
 git merge origin/hj.ra < 머지시키기
 
-
-https://yesviz.com/viewport/ 여기가 좀 참고가 될 것 같습니다 기기별 뷰포트사이즈 실제사이즈 등이 정리되어 있어요
